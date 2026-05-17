@@ -43,6 +43,8 @@ namespace CoasterCam
 
         private int _seatIndex;
 
+        public float SmoothingAmount { get; set; } = ModSettings.DefaultSmoothing;
+
 
         private List<Tuple<string, Vector3, Vector3>> _views = new List<Tuple<string, Vector3, Vector3>>()
         {
@@ -177,8 +179,9 @@ namespace CoasterCam
                 if (_coaster != null)
                 {
                     var point1 = _coaster.Track.getPoint(_coaster.Track.trains[0].currentTrackPosition);
-                    var lookAtPosition = _coaster.Track.trains[0].currentTrackPosition + 1.5f +
-                                         _coaster.Track.trains[0].velocity / 30;
+                    float lookAhead = Mathf.Lerp(0f, 1.5f, SmoothingAmount); // look further ahead when smoothing
+                    float velocityOffset = (_coaster.Track.trains[0].velocity / 30) * SmoothingAmount; // faster -> reach point faster
+                    var lookAtPosition = _coaster.Track.trains[0].currentTrackPosition + lookAhead + velocityOffset;
                     var point2 = _coaster.Track.getPoint(lookAtPosition);
                     var oldRot = _head.transform.localEulerAngles;
 
